@@ -3,20 +3,23 @@ package utils
 import (
 	"crypto/md5"
 	"encoding/hex"
-	"encoding/json"
+	"errors"
 	"fmt"
+	"io/ioutil"
 	"log"
 	"math/rand"
 	"net/http"
 	"strconv"
 	"time"
+
+	"github.com/Jeffail/gabs/v2"
 )
 
 type Translator struct {
 	client *http.Client
 }
 
-func (t *Translator) Translate(source string, appId string, secret string, target interface{}) error {
+func (t *Translator) Translate(source string, appId string, secret string) (string, error) {
 	salt := rand.Intn(time.Now().Second())
 	merge := appId + source + strconv.Itoa(salt) + secret
 	h := md5.New()
@@ -26,7 +29,7 @@ func (t *Translator) Translate(source string, appId string, secret string, targe
 	result, err := t.client.Get(req)
 	if err != nil {
 		log.Fatalf("failed to call translate API, err:%v", err)
-		return err
+		return "", err
 	}
 	defer func() {
 		err := result.Body.Close()
@@ -35,7 +38,13 @@ func (t *Translator) Translate(source string, appId string, secret string, targe
 		}
 	}()
 
-	return json.NewDecoder(result.Body).Decode(target)
+	data, err := ioutil.ReadAll(result.Body)
+	jsonParsed, err := gabs.ParseJSON(data)
+	translateResult, ok := jsonParsed.Search("trans_result", "0", "dst").Data().(string)
+	if ok {
+		return translateResult, nil
+	}
+	return "", errors.New("failed to parse translate result json")
 }
 
 func NewTranslator() *Translator {
