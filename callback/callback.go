@@ -18,9 +18,6 @@ func handler(w http.ResponseWriter, r *http.Request) {
 			log.Println("Url Param 'challenge' is missing")
 			return
 		}
-
-		// Query()["key"] will return an array of items,
-		// we only want the single item.
 		challenge := challenges[0]
 
 		log.Println("Url Param 'challenge' is: " + string(challenge))
