@@ -1,0 +1,33 @@
+srun:
+  # timeout for analysis, e.g. 30s, 5m
+  deadline: 5m
+
+linters-settings:
+  govet:
+    check-shadowing: true
+  golint:
+    min-confidence: 0
+  maligned:
+    suggest-new: true
+  dupl:
+    threshold: 100
+  goconst:
+    min-len: 2
+    min-occurrences: 2
+  misspell:
+    locale: US
+  lll:
+    line-length: 150
+
+linters:
+  disable-all: true
+  enable:
+    - misspell
+    # - deadcode
+    - goimports
+    - gofmt
+    # - goconst //TODO fix and reopen goconst
+    # - lll
+    # - govet
+    - ineffassign
+  # - maligned
