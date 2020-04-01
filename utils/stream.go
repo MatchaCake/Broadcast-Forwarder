@@ -42,6 +42,7 @@ func (s *Stream) GetStreamDetail(key string) error {
 			log.Fatalf("failed to close result body, err:%v", err)
 		}
 	}()
+
 	data, err := ioutil.ReadAll(result.Body)
 	if err != nil {
 		log.Fatalf("failed to read stream result body, err:%v", err)
