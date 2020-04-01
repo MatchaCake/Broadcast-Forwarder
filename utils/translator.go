@@ -24,8 +24,8 @@ func (t *Translator) Translate(source string, appId string, secret string) (stri
 	merge := appId + source + strconv.Itoa(salt) + secret
 	h := md5.New()
 	sign := hex.EncodeToString(h.Sum([]byte(merge)))
-	req := fmt.Sprintf("https://fanyi-api.baidu.com/api/trans/vip/translate?q=%s&from=%s&to=%s&appid=%s&salt=%v&sign=%s",
-		source, "jp", "zh", appId, salt, sign)
+	url := "https://fanyi-api.baidu.com/api/trans/vip/translate"
+	req := fmt.Sprintf("%s?q=%s&from=%s&to=%s&appid=%s&salt=%v&sign=%s", url, source, "jp", "zh", appId, salt, sign)
 	result, err := t.client.Get(req)
 	if err != nil {
 		log.Fatalf("failed to call translate API, err:%v", err)
@@ -34,7 +34,7 @@ func (t *Translator) Translate(source string, appId string, secret string) (stri
 	defer func() {
 		err := result.Body.Close()
 		if err != nil {
-			log.Fatalf("failed to close request body, err:%v", err)
+			log.Fatalf("failed to close result body, err:%v", err)
 		}
 	}()
 
