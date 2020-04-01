@@ -39,12 +39,20 @@ func (t *Translator) Translate(source string, appId string, secret string) (stri
 	}()
 
 	data, err := ioutil.ReadAll(result.Body)
+	if err != nil {
+		log.Fatalf("failed to read translate result body, err:%v", err)
+		return "", err
+	}
 	jsonParsed, err := gabs.ParseJSON(data)
+	if err != nil {
+		log.Fatalf("failed to parse translate result json, err:%v", err)
+		return "", err
+	}
 	translateResult, ok := jsonParsed.Search("trans_result", "0", "dst").Data().(string)
 	if ok {
 		return translateResult, nil
 	}
-	return "", errors.New("failed to parse translate result json")
+	return "", errors.New("failed to find translate result dst")
 }
 
 func NewTranslator() *Translator {
